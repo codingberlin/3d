@@ -15,6 +15,8 @@ import renderEngine.Loader;
 import renderEngine.MasterRenderer;
 import renderEngine.OBJLoader;
 import terrains.Terrain;
+import terrains.TerrainTexture;
+import terrains.TerrainTextureePack;
 import textures.ModelTexture;
 import entities.Camera;
 import entities.Entity;
@@ -26,22 +28,25 @@ public class MainGameLoop {
 
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
-		
-		
+
+		final var grassTexture = new TerrainTexture(loader.loadTexture("grass"));
+		final var snowTexture = new TerrainTexture(loader.loadTexture("snow"));
+		final var terrainTexturePack = new TerrainTextureePack(grassTexture, snowTexture);
+
 		RawModel model = OBJLoader.loadObjModel("tree", loader);
-		
+
 		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("tree")));
-		
+
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random();
 		for(int i=0;i<500;i++){
 			entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
 		}
-		
+
 		Light light = new Light(new Vector3f(20000,20000,2000),new Vector3f(1,1,1));
-		
-		Terrain terrain = new Terrain(0,-1,loader,new ModelTexture(loader.loadTexture("grass")), "heightmap");
-		Terrain terrain2 = new Terrain(-1,-1,loader,new ModelTexture(loader.loadTexture("grass")), "heightmap");
+
+		Terrain terrain = new Terrain(0,-1,loader,terrainTexturePack, "heightmap3");
+		Terrain terrain2 = new Terrain(-1,-1,loader,terrainTexturePack, "heightmap3");
 		
 		Camera camera = new Camera();	
 		MasterRenderer renderer = new MasterRenderer();

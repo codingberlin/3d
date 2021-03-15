@@ -4,7 +4,7 @@ in vec2 pass_textureCoordinates;
 in vec3 surfaceNormal;
 in vec3 toLightVector;
 in vec3 toCameraVector;
-in float normalisedHeight;
+in float normalizedHeight;
 
 out vec4 out_Color;
 
@@ -15,6 +15,13 @@ uniform float shineDamper;
 uniform float reflectivity;
 
 void main(void){
+
+    vec2 tiledCoords = pass_textureCoordinates * 40;
+    float grassTextureAmount = 1;//normalizedHeight;
+    float snowTextureAmount = 0;//1 - normalizedHeight;
+    vec4 grassTextureColor = texture(grassTexture, tiledCoords);// * grassTextureAmount;
+    vec4 snowTextureColor = texture(snowTexture, tiledCoords) * snowTextureAmount;
+    vec4 totalTextureColor = grassTextureColor + snowTextureColor;
 
 	vec3 unitNormal = normalize(surfaceNormal);
 	vec3 unitLightVector = normalize(toLightVector);
@@ -31,11 +38,8 @@ void main(void){
 	specularFactor = max(specularFactor,0.0);
 	float dampedFactor = pow(specularFactor,shineDamper);
 	vec3 finalSpecular = dampedFactor * reflectivity * lightColour;
+	
 
-	float snowAmount = min(1, max(0, 4 * (normalisedHeight - 0.6)));
-	float grassAmount = 1 - snowAmount;
-    vec4 totalTextureColor = grassAmount * texture(grassTexture,pass_textureCoordinates) + snowAmount * texture(snowTexture,pass_textureCoordinates);
-
-	out_Color =  vec4(diffuse,1.0) * totalTextureColor + vec4(finalSpecular,1.0);
+	out_Color =  vec4(diffuse,1.0) * grassTextureColor + vec4(finalSpecular,1.0);
 
 }

@@ -3,7 +3,6 @@ package terrains;
 import models.RawModel;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.Loader;
-import textures.ModelTexture;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Terrain {
-	
+
 	private static final float SIZE = 800;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
@@ -19,17 +18,19 @@ public class Terrain {
 	private float x;
 	private float z;
 	private RawModel model;
-	private ModelTexture texture;
-	
-	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, String heightMap){
-		this.texture = texture;
+	private TerrainTextureePack terrainTexturePack;
+
+	public Terrain(final int gridX, final int gridZ, final Loader loader, final TerrainTextureePack terrainTextureePack, final String heightMap){
+		this.terrainTexturePack = terrainTextureePack;
 		this.x = gridX * SIZE;
 		this.z = gridZ * SIZE;
 		this.model = generateTerrain(loader, heightMap);
 	}
-	
-	
-	
+
+	public TerrainTextureePack getTerrainTexturePack() {
+		return terrainTexturePack;
+	}
+
 	public float getX() {
 		return x;
 	}
@@ -44,12 +45,6 @@ public class Terrain {
 
 	public RawModel getModel() {
 		return model;
-	}
-
-
-
-	public ModelTexture getTexture() {
-		return texture;
 	}
 
 	private RawModel generateTerrain(Loader loader, String heightMap){

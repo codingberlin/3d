@@ -3,7 +3,6 @@ package renderEngine;
 import java.util.List;
 
 import models.RawModel;
-import models.TexturedModel;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -14,7 +13,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import shaders.TerrainShader;
 import terrains.Terrain;
-import textures.ModelTexture;
 import toolbox.Maths;
 
 public class TerrainRenderer {
@@ -38,16 +36,19 @@ public class TerrainRenderer {
 		}
 	}
 
-	private void prepareTerrain(Terrain terrain) {
+	private void prepareTerrain(final Terrain terrain) {
 		RawModel rawModel = terrain.getModel();
 		GL30.glBindVertexArray(rawModel.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
-		ModelTexture texture = terrain.getTexture();
-		shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
+		shader.loadShineVariables(1, 0);
+		shader.connectTextureUnits();
+		final var pack = terrain.getTerrainTexturePack();
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getID());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, pack.getGrass().getTextureId());
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, pack.getSnow().getTextureId());
 	}
 
 	private void unbindTexturedModel() {
