@@ -1,5 +1,9 @@
 package engineTester;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import models.RawModel;
 import models.TexturedModel;
 
@@ -8,11 +12,13 @@ import org.lwjgl.util.vector.Vector3f;
 
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
-import renderEngine.Renderer;
-import shaders.StaticShader;
+import renderEngine.MasterRenderer;
+import renderEngine.OBJLoader;
+import terrains.Terrain;
 import textures.ModelTexture;
 import entities.Camera;
 import entities.Entity;
+import entities.Light;
 
 public class MainGameLoop {
 
@@ -20,108 +26,38 @@ public class MainGameLoop {
 
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
-		StaticShader shader = new StaticShader();
-		Renderer renderer = new Renderer(shader);
 		
-		float[] vertices = {			
-				-0.5f,0.5f,0,	
-				-0.5f,-0.5f,0,	
-				0.5f,-0.5f,0,	
-				0.5f,0.5f,0,		
-				
-				-0.5f,0.5f,1,	
-				-0.5f,-0.5f,1,	
-				0.5f,-0.5f,1,	
-				0.5f,0.5f,1,
-				
-				0.5f,0.5f,0,	
-				0.5f,-0.5f,0,	
-				0.5f,-0.5f,1,	
-				0.5f,0.5f,1,
-				
-				-0.5f,0.5f,0,	
-				-0.5f,-0.5f,0,	
-				-0.5f,-0.5f,1,	
-				-0.5f,0.5f,1,
-				
-				-0.5f,0.5f,1,
-				-0.5f,0.5f,0,
-				0.5f,0.5f,0,
-				0.5f,0.5f,1,
-				
-				-0.5f,-0.5f,1,
-				-0.5f,-0.5f,0,
-				0.5f,-0.5f,0,
-				0.5f,-0.5f,1
-				
-		};
 		
-		float[] textureCoords = {
-				
-				0,0,
-				0,1,
-				1,1,
-				1,0,			
-				0,0,
-				0,1,
-				1,1,
-				1,0,			
-				0,0,
-				0,1,
-				1,1,
-				1,0,
-				0,0,
-				0,1,
-				1,1,
-				1,0,
-				0,0,
-				0,1,
-				1,1,
-				1,0,
-				0,0,
-				0,1,
-				1,1,
-				1,0
-
-				
-		};
+		RawModel model = OBJLoader.loadObjModel("tree", loader);
 		
-		int[] indices = {
-				0,1,3,	
-				3,1,2,	
-				4,5,7,
-				7,5,6,
-				8,9,11,
-				11,9,10,
-				12,13,15,
-				15,13,14,	
-				16,17,19,
-				19,17,18,
-				20,21,23,
-				23,21,22
-
-		};
+		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("tree")));
 		
-		RawModel model = loader.loadToVAO(vertices,textureCoords,indices);
+		List<Entity> entities = new ArrayList<Entity>();
+		Random random = new Random();
+		for(int i=0;i<500;i++){
+			entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
+		}
 		
-		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("image")));
+		Light light = new Light(new Vector3f(20000,20000,2000),new Vector3f(1,1,1));
 		
-		Entity entity = new Entity(staticModel, new Vector3f(0,0,-5),0,0,0,1);
+		Terrain terrain = new Terrain(0,-1,loader,new ModelTexture(loader.loadTexture("grass")));
+		Terrain terrain2 = new Terrain(-1,-1,loader,new ModelTexture(loader.loadTexture("grass")));
 		
-		Camera camera = new Camera();
+		Camera camera = new Camera();	
+		MasterRenderer renderer = new MasterRenderer();
 		
 		while(!Display.isCloseRequested()){
-			entity.increaseRotation(0.1F, 0.1F, 0);
 			camera.move();
-			renderer.prepare();
-			shader.start();
-			shader.loadViewMatrix(camera);
-			renderer.render(entity,shader);
-			shader.stop();
+			renderer.processTerrain(terrain);
+			renderer.processTerrain(terrain2);
+			for(Entity entity:entities){
+				renderer.processEntity(entity);
+			}
+			renderer.render(light, camera);
 			DisplayManager.updateDisplay();
 		}
 
-		shader.cleanUp();
+		renderer.cleanUp();
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
 
