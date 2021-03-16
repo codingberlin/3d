@@ -36,12 +36,15 @@ public class MainGameLoop {
 		RawModel model = OBJLoader.loadObjModel("tree", loader);
 
 		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("tree")));
+		final var houseModel = new TexturedModel(OBJLoader.loadObjModel("house", loader),new ModelTexture(loader.loadTexture("image")));
 
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random();
 		for(int i=0;i<500;i++){
 			entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
 		}
+		entities.add(new Entity(houseModel, new Vector3f(0,0,-200),0,-90,0,6));
+		entities.add(new Entity(houseModel, new Vector3f(50,0,-150),0,-90,0,6));
 
 		Light light = new Light(new Vector3f(20000,20000,2000),new Vector3f(1,1,1));
 
