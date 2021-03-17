@@ -2,11 +2,13 @@ package models;
 
 public class RawModel {
 	
-	private int vaoID;
-	private int vertexCount;
+	private final int vaoID;
+	private final int[] vboIds;
+	private final int vertexCount;
 	
-	public RawModel(int vaoID, int vertexCount){
+	public RawModel(final int vaoID, final int[] vboIds, final int vertexCount){
 		this.vaoID = vaoID;
+		this.vboIds = vboIds;
 		this.vertexCount = vertexCount;
 	}
 
@@ -17,7 +19,8 @@ public class RawModel {
 	public int getVertexCount() {
 		return vertexCount;
 	}
-	
-	
 
+	public int[] getVboIds() {
+		return vboIds;
+	}
 }

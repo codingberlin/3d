@@ -19,12 +19,14 @@ public class Terrain {
 	private float z;
 	private RawModel model;
 	private TerrainTextureePack terrainTexturePack;
+	private float[][] heights;
 
 	public Terrain(final int gridX, final int gridZ, final Loader loader, final TerrainTextureePack terrainTextureePack, final String heightMap){
 		this.terrainTexturePack = terrainTextureePack;
 		this.x = gridX * SIZE;
 		this.z = gridZ * SIZE;
-		this.model = generateTerrain(loader, heightMap);
+		loadHeightsFromHeightmap(heightMap);
+		this.model = generateTerrain(loader);
 	}
 
 	public TerrainTextureePack getTerrainTexturePack() {
@@ -35,52 +37,41 @@ public class Terrain {
 		return x;
 	}
 
-
-
 	public float getZ() {
 		return z;
 	}
-
-
 
 	public RawModel getModel() {
 		return model;
 	}
 
-	private RawModel generateTerrain(Loader loader, String heightMap){
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(new File("res/" + heightMap + ".png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		final int VERTEX_COUNT = image.getHeight();
-		int count = VERTEX_COUNT * VERTEX_COUNT;
+	private RawModel generateTerrain(Loader loader){
+		int count = heights.length * heights.length;
 		float[] vertices = new float[count * 3];
 		float[] normals = new float[count * 3];
 		float[] textureCoords = new float[count*2];
-		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
+		int[] indices = new int[6*(heights.length-1)*(heights.length-1)];
 		int vertexPointer = 0;
-		for(int i=0;i<VERTEX_COUNT;i++){
-			for(int j=0;j<VERTEX_COUNT;j++){
-				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;
-				vertices[vertexPointer*3+1] = getHeight(j, i, image);
-				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;
-				final var normal = calculateNormal(j, i, image);
+		for(int i=0;i<heights.length;i++){
+			for(int j=0;j<heights.length;j++){
+				vertices[vertexPointer*3] = (float)j/((float)heights.length - 1) * SIZE;
+				vertices[vertexPointer*3+1] = getHeight(j, i);
+				vertices[vertexPointer*3+2] = (float)i/((float)heights.length - 1) * SIZE;
+				final var normal = calculateNormal(j, i);
 				normals[vertexPointer*3] = normal.x;
 				normals[vertexPointer*3+1] = normal.y;
 				normals[vertexPointer*3+2] = normal.z;
-				textureCoords[vertexPointer*2] = (float)j/((float)VERTEX_COUNT - 1);
-				textureCoords[vertexPointer*2+1] = (float)i/((float)VERTEX_COUNT - 1);
+				textureCoords[vertexPointer*2] = (float)j/((float)heights.length - 1);
+				textureCoords[vertexPointer*2+1] = (float)i/((float)heights.length - 1);
 				vertexPointer++;
 			}
 		}
 		int pointer = 0;
-		for(int gz=0;gz<VERTEX_COUNT-1;gz++){
-			for(int gx=0;gx<VERTEX_COUNT-1;gx++){
-				int topLeft = (gz*VERTEX_COUNT)+gx;
+		for(int gz=0;gz<heights.length-1;gz++){
+			for(int gx=0;gx<heights.length-1;gx++){
+				int topLeft = (gz*heights.length)+gx;
 				int topRight = topLeft + 1;
-				int bottomLeft = ((gz+1)*VERTEX_COUNT)+gx;
+				int bottomLeft = ((gz+1)*heights.length)+gx;
 				int bottomRight = bottomLeft + 1;
 				indices[pointer++] = topLeft;
 				indices[pointer++] = bottomLeft;
@@ -93,17 +84,40 @@ public class Terrain {
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
-	private Vector3f calculateNormal(final int x, final int y, final BufferedImage heightMap) {
-		final var heightL = getHeight(x-1, y, heightMap);
-		final var heightR = getHeight(x+1, y, heightMap);
-		final var heightD = getHeight(x, y-1, heightMap);
-		final var heightU = getHeight(x, y+1, heightMap);
+	private void loadHeightsFromHeightmap(final String heightMap) {
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new File("res/" + heightMap + ".png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		final int VERTEX_COUNT = image.getHeight();
+		heights = new float[VERTEX_COUNT][VERTEX_COUNT];
+		for(int i=0;i<VERTEX_COUNT;i++) {
+			for (int j = 0; j < VERTEX_COUNT; j++) {
+				heights[i][j] = getHeightFromImage(j,i, image);
+			}
+		}
+	}
+
+	private Vector3f calculateNormal(final int x, final int y) {
+		final var heightL = getHeight(x-1, y);
+		final var heightR = getHeight(x+1, y);
+		final var heightD = getHeight(x, y-1);
+		final var heightU = getHeight(x, y+1);
 		final var normal = new Vector3f(heightL-heightR, 2F, heightD  - heightU);
 		normal.normalise();
 		return normal;
 	}
 
-	private float getHeight(final int x, final int y, final BufferedImage heightMap) {
+	private float getHeight(final int x, final int y) {
+		if (x < 0 || x >= heights.length || y < 0 || y >= heights.length) {
+			return 0;
+		}
+		return heights[x][y];
+	}
+
+	private float getHeightFromImage(final int x, final int y, final BufferedImage heightMap) {
 		if (x<0 || x>=heightMap.getHeight() || y<0 || y>=heightMap.getHeight()) {
 			return 0;
 		}
