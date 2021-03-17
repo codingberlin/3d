@@ -20,13 +20,15 @@ public class Terrain {
 	private RawModel model;
 	private TerrainTextureePack terrainTexturePack;
 	private float[][] heights;
+	private Loader loader;
 
 	public Terrain(final int gridX, final int gridZ, final Loader loader, final TerrainTextureePack terrainTextureePack, final String heightMap){
+		this.loader = loader;
 		this.terrainTexturePack = terrainTextureePack;
 		this.x = gridX * SIZE;
 		this.z = gridZ * SIZE;
 		loadHeightsFromHeightmap(heightMap);
-		this.model = generateTerrain(loader);
+		this.model = generateTerrain();
 	}
 
 	public TerrainTextureePack getTerrainTexturePack() {
@@ -45,7 +47,7 @@ public class Terrain {
 		return model;
 	}
 
-	private RawModel generateTerrain(Loader loader){
+	private RawModel generateTerrain(){
 		int count = heights.length * heights.length;
 		float[] vertices = new float[count * 3];
 		float[] normals = new float[count * 3];
