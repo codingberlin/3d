@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import shaders.TerrainShader;
-import terrains.Terrain;
+import terrains.GameMap;
 import toolbox.Maths;
 
 public class TerrainRenderer {
@@ -26,8 +26,8 @@ public class TerrainRenderer {
 		shader.stop();
 	}
 
-	public void render(List<Terrain> terrains) {
-		for (Terrain terrain : terrains) {
+	public void render(List<GameMap> terrains) {
+		for (GameMap terrain : terrains) {
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);
 			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(),
@@ -36,7 +36,7 @@ public class TerrainRenderer {
 		}
 	}
 
-	private void prepareTerrain(final Terrain terrain) {
+	private void prepareTerrain(final GameMap terrain) {
 		RawModel rawModel = terrain.getModel();
 		GL30.glBindVertexArray(rawModel.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
@@ -58,7 +58,7 @@ public class TerrainRenderer {
 		GL30.glBindVertexArray(0);
 	}
 
-	private void loadModelMatrix(Terrain terrain) {
+	private void loadModelMatrix(GameMap terrain) {
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
 				new Vector3f(terrain.getX(), 0, terrain.getZ()), 0, 0, 0, 1);
 		shader.loadTransformationMatrix(transformationMatrix);

@@ -3,7 +3,6 @@ package renderEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import models.TexturedModel;
 
@@ -13,7 +12,7 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import shaders.StaticShader;
 import shaders.TerrainShader;
-import terrains.Terrain;
+import terrains.GameMap;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -33,8 +32,8 @@ public class MasterRenderer {
 	private TerrainShader terrainShader = new TerrainShader();
 	
 	
-	private Map<TexturedModel,List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
-	private List<Terrain> terrains = new ArrayList<Terrain>();
+	private java.util.Map entities = new HashMap<TexturedModel,List<Entity>>();
+	private List<GameMap> terrains = new ArrayList<GameMap>();
 	
 	public MasterRenderer(){
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -60,7 +59,7 @@ public class MasterRenderer {
 		entities.clear();
 	}
 	
-	public void processTerrain(Terrain terrain){
+	public void processTerrain(GameMap terrain){
 		terrains.add(terrain);
 	}
 	

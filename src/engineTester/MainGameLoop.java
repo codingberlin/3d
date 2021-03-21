@@ -7,7 +7,6 @@ import java.util.Random;
 import models.RawModel;
 import models.TexturedModel;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -15,9 +14,7 @@ import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
 import renderEngine.OBJLoader;
-import terrains.Terrain;
-import terrains.TerrainTexture;
-import terrains.TerrainTextureePack;
+import terrains.*;
 import textures.ModelTexture;
 import entities.Camera;
 import entities.Entity;
@@ -39,8 +36,63 @@ public class MainGameLoop {
 		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("tree")));
 		final var houseModel = new TexturedModel(OBJLoader.loadObjModel("house", loader),new ModelTexture(loader.loadTexture("image")));
 
-		final var terrain = new Terrain(0,-1,loader,terrainTexturePack, "heightmap3");
-		final var terrain2 = new Terrain(-1,-1,loader,terrainTexturePack, "heightmap3");
+		final var map = new GameMap();
+		final var buildingProperty = new BuildingProperty(List.of(
+				new XY(1,1),
+		        new XY(2,1),
+				new XY(5,1),
+				new XY(6,1),
+				new XY(1,2),
+				new XY(2,2),
+				new XY(5,2),
+				new XY(6,2),
+				new XY(1,3),
+				new XY(2,3),
+				new XY(3,3),
+				new XY(4,3),
+				new XY(5,3),
+				new XY(6,3),
+				new XY(1,4),
+				new XY(2,4),
+				new XY(3,4),
+				new XY(4,4),
+				new XY(5,4),
+				new XY(6,4)
+		), List.of(
+				new XY(0,0),
+				new XY(1,0),
+				new XY(2,0),
+				new XY(3,0),
+				new XY(4,0),
+				new XY(5,0),
+				new XY(6,1),
+				new XY(7,1),
+				new XY(0,1),
+				new XY(3,1),
+				new XY(4,1),
+				new XY(7,1),
+				new XY(0,2),
+				new XY(3,2),
+				new XY(4,2),
+				new XY(7,2),
+				new XY(0,3),
+				new XY(7,3),
+				new XY(0,4),
+				new XY(7,4),
+				new XY(0,7),
+				new XY(1,7),
+				new XY(2,7),
+				new XY(3,7),
+				new XY(4,7),
+				new XY(5,7),
+				new XY(6,7),
+				new XY(7,7)
+		));
+		if (map.doesBuildingFit(10, 10, buildingProperty)) {
+			map.placeBuilding(10, 10, buildingProperty);
+		} else {
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ passt nicht");
+		}
 
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random();
