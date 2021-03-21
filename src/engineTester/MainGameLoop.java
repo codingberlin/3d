@@ -105,8 +105,8 @@ public class MainGameLoop {
 		//	final var z = random.nextFloat() * -600;
 		//	entities.add(new Entity(staticModel, new Vector3f(x, terrain.getHeightAt(x, z) + terrain2.getHeightAt(x, z), z),0,0,0,3));
 		//}
-		entities.add(new Entity(houseModel, new Vector3f(0,0,-200),0,-90,0,6));
-		entities.add(new Entity(houseModel, new Vector3f(50,0,-150),0,-90,0,6));
+		entities.add(new Entity(houseModel, new Vector3f(0,0,-200),0,0,0,1));
+		entities.add(new Entity(houseModel, new Vector3f(50,0,-150),0,0,0,1));
 
 		Light light = new Light(new Vector3f(-20000,20000,2000),new Vector3f(1,1,1));
 
