@@ -27,9 +27,6 @@ public class MainGameLoop {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
 
-		final var grassTexture = new TerrainTexture(loader.loadTexture("grass"));
-		final var snowTexture = new TerrainTexture(loader.loadTexture("snow"));
-		final var terrainTexturePack = new TerrainTextureePack(grassTexture, snowTexture);
 
 		RawModel model = OBJLoader.loadObjModel("tree", loader);
 
@@ -37,6 +34,10 @@ public class MainGameLoop {
 		final var houseModel = new TexturedModel(OBJLoader.loadObjModel("house", loader),new ModelTexture(loader.loadTexture("image")));
 
 		final var map = new GameMap();
+		final var grassTexture = new TerrainTexture(loader.loadTexture("grass"));
+		final var snowTexture = new TerrainTexture(loader.loadTexture("snow"));
+		final var terrainTexturePack = new TerrainTextureePack(grassTexture, snowTexture);
+		final var terrainTile = new TerrainTile(map, loader, terrainTexturePack);
 		final var buildingProperty = new BuildingProperty(List.of(
 				new XY(1,1),
 		        new XY(2,1),
@@ -114,8 +115,7 @@ public class MainGameLoop {
 		
 		while(!Display.isCloseRequested()){
 			camera.move();
-			renderer.processTerrain(terrain);
-			renderer.processTerrain(terrain2);
+			renderer.processTerrain(terrainTile);
 			for(Entity entity:entities){
 				renderer.processEntity(entity);
 			}

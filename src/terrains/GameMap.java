@@ -15,14 +15,10 @@ import java.util.stream.Stream;
 public class GameMap {
 
     private static final int SIZE = 100;
-    private final int[][] height = new int[SIZE][SIZE];
     private boolean depictionHasChanged = true;
-
-    private RawModel model;
-    private TerrainTextureePack terrainTexturePack;
-    private boolean[][] blocked;
-    private boolean[][] reserved;
-    private Loader loader;
+    private final int[][] height = new int[SIZE][SIZE];
+    private boolean[][] blocked = new boolean[SIZE][SIZE];
+    private boolean[][] reserved = new boolean[SIZE][SIZE];
 
     public GameMap() {
         setupTerrain();
@@ -69,33 +65,34 @@ public class GameMap {
         }
     }
 
-    private RawModel generateTerrain() {
-        int count = heights.length * heights.length;
+    public RawModel generateRawModel(final Loader loader) {
+        this.depictionHasChanged = false;
+        int count = SIZE * SIZE;
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
         float[] textureCoords = new float[count * 2];
-        int[] indices = new int[6 * (heights.length - 1) * (heights.length - 1)];
+        int[] indices = new int[6 * (SIZE - 1) * (SIZE - 1)];
         int vertexPointer = 0;
-        for (int i = 0; i < heights.length; i++) {
-            for (int j = 0; j < heights.length; j++) {
-                vertices[vertexPointer * 3] = (float) j / ((float) heights.length - 1) * SIZE;
-                vertices[vertexPointer * 3 + 1] = getHeight(j, i);
-                vertices[vertexPointer * 3 + 2] = (float) i / ((float) heights.length - 1) * SIZE;
-                final var normal = calculateNormal(j, i);
+        for (int x = 0; x < SIZE; x++) {
+            for (int y = 0; y < SIZE; y++) {
+                vertices[vertexPointer * 3] = (float) y / ((float) SIZE - 1) * SIZE;
+                vertices[vertexPointer * 3 + 1] = height[x][y];
+                vertices[vertexPointer * 3 + 2] = (float) x / ((float) SIZE - 1) * SIZE;
+                final var normal = calculateNormal(x, y);
                 normals[vertexPointer * 3] = normal.x;
                 normals[vertexPointer * 3 + 1] = normal.y;
                 normals[vertexPointer * 3 + 2] = normal.z;
-                textureCoords[vertexPointer * 2] = (float) j / ((float) heights.length - 1);
-                textureCoords[vertexPointer * 2 + 1] = (float) i / ((float) heights.length - 1);
+                textureCoords[vertexPointer * 2] = (float) y / ((float) SIZE - 1);
+                textureCoords[vertexPointer * 2 + 1] = (float) x / ((float) SIZE - 1);
                 vertexPointer++;
             }
         }
         int pointer = 0;
-        for (int gz = 0; gz < heights.length - 1; gz++) {
-            for (int gx = 0; gx < heights.length - 1; gx++) {
-                int topLeft = (gz * heights.length) + gx;
+        for (int gz = 0; gz < SIZE - 1; gz++) {
+            for (int gx = 0; gx < SIZE - 1; gx++) {
+                int topLeft = (gz * SIZE) + gx;
                 int topRight = topLeft + 1;
-                int bottomLeft = ((gz + 1) * heights.length) + gx;
+                int bottomLeft = ((gz + 1) * SIZE) + gx;
                 int bottomRight = bottomLeft + 1;
                 indices[pointer++] = topLeft;
                 indices[pointer++] = bottomLeft;
@@ -108,11 +105,17 @@ public class GameMap {
         return loader.loadToVAO(vertices, textureCoords, normals, indices);
     }
 
+    public boolean hasDepictionChanged() {
+        return depictionHasChanged;
+    }
+
     private Vector3f calculateNormal(final int x, final int y) {
-        final var heightL = getHeight(x - 1, y);
-        final var heightR = getHeight(x + 1, y);
-        final var heightD = getHeight(x, y - 1);
-        final var heightU = getHeight(x, y + 1);
+        final var xx = Math.max(1, Math.min(SIZE - 2, x));
+        final var yy = Math.max(1, Math.min(SIZE - 2, y));
+        final var heightL = height[xx - 1][yy];
+        final var heightR = height[xx + 1][yy];
+        final var heightD = height[xx][yy - 1];
+        final var heightU = height[xx][yy + 1];
         final var normal = new Vector3f(heightL - heightR, 2F, heightD - heightU);
         normal.normalise();
         return normal;

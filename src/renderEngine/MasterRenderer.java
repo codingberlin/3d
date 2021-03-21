@@ -16,6 +16,7 @@ import terrains.GameMap;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import terrains.TerrainTile;
 
 public class MasterRenderer {
 	
@@ -32,8 +33,8 @@ public class MasterRenderer {
 	private TerrainShader terrainShader = new TerrainShader();
 	
 	
-	private java.util.Map entities = new HashMap<TexturedModel,List<Entity>>();
-	private List<GameMap> terrains = new ArrayList<GameMap>();
+	private java.util.Map<TexturedModel, List<Entity>> entities = new HashMap<>();
+	private List<TerrainTile> terrains = new ArrayList<>();
 	
 	public MasterRenderer(){
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -59,7 +60,7 @@ public class MasterRenderer {
 		entities.clear();
 	}
 	
-	public void processTerrain(GameMap terrain){
+	public void processTerrain(TerrainTile terrain){
 		terrains.add(terrain);
 	}
 	
