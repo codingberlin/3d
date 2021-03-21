@@ -27,7 +27,7 @@ public class GameMap {
     private void setupTerrain() {
         IntStream.range(0, SIZE).forEach(x ->
                 IntStream.range(0, SIZE).forEach(y -> {
-				    height[x][y] = Math.max(x, y);
+				    height[x][y] = y % 3;
 				    blocked[x][y] = false;
                     reserved[x][y] = false;
                 })
