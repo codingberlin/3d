@@ -1,9 +1,11 @@
 package engineTester;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import entities.*;
 import models.RawModel;
 import models.TexturedModel;
 
@@ -16,13 +18,10 @@ import renderEngine.MasterRenderer;
 import renderEngine.OBJLoader;
 import terrains.*;
 import textures.ModelTexture;
-import entities.Camera;
-import entities.Entity;
-import entities.Light;
 
 public class MainGameLoop {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
@@ -38,61 +37,19 @@ public class MainGameLoop {
 		final var snowTexture = new TerrainTexture(loader.loadTexture("snow"));
 		final var terrainTexturePack = new TerrainTextureePack(grassTexture, snowTexture);
 		final var terrainTile = new TerrainTile(map, loader, terrainTexturePack);
-		final var buildingProperty = new BuildingProperty(List.of(
-				new XY(1,1),
-		        new XY(2,1),
-				new XY(5,1),
-				new XY(6,1),
-				new XY(1,2),
-				new XY(2,2),
-				new XY(5,2),
-				new XY(6,2),
-				new XY(1,3),
-				new XY(2,3),
-				new XY(3,3),
-				new XY(4,3),
-				new XY(5,3),
-				new XY(6,3),
-				new XY(1,4),
-				new XY(2,4),
-				new XY(3,4),
-				new XY(4,4),
-				new XY(5,4),
-				new XY(6,4)
-		), List.of(
-				new XY(0,0),
-				new XY(1,0),
-				new XY(2,0),
-				new XY(3,0),
-				new XY(4,0),
-				new XY(5,0),
-				new XY(6,1),
-				new XY(7,1),
-				new XY(0,1),
-				new XY(3,1),
-				new XY(4,1),
-				new XY(7,1),
-				new XY(0,2),
-				new XY(3,2),
-				new XY(4,2),
-				new XY(7,2),
-				new XY(0,3),
-				new XY(7,3),
-				new XY(0,4),
-				new XY(7,4),
-				new XY(0,7),
-				new XY(1,7),
-				new XY(2,7),
-				new XY(3,7),
-				new XY(4,7),
-				new XY(5,7),
-				new XY(6,7),
-				new XY(7,7)
-		));
-		if (map.doesBuildingFit(10, 10, buildingProperty)) {
-			map.placeBuilding(10, 10, buildingProperty);
+
+		final var buildingLoader = new BuildingLoader();
+		final var house1 = new Building(new XY(80, 10), buildingLoader.loadBuilding("house"));
+		final var house2 = new Building(new XY(80, 40), buildingLoader.loadBuilding("house"));
+		if (map.doesBuildingFit(house1)) {
+			map.placeBuilding(house1);
 		} else {
-			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ passt nicht");
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ 1 passt nicht");
+		}
+		if (map.doesBuildingFit(house2)) {
+			map.placeBuilding(house2);
+		} else {
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ 2 passt nicht");
 		}
 
 		List<Entity> entities = new ArrayList<Entity>();

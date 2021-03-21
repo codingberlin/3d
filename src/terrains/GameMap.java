@@ -1,5 +1,6 @@
 package terrains;
 
+import entities.Building;
 import models.RawModel;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.Loader;
@@ -38,34 +39,33 @@ public class GameMap {
         );
     }
 
-    public boolean doesBuildingFit(final int x, final int y, final BuildingProperty building) {
-        return !Stream.concat(building.getBlocking().stream(), building.getAdditionalReserving().stream()).anyMatch(xy -> {
-            final var absoluteX = x + xy.getX();
-            final var absoluteY = y + xy.getY();
+    public boolean doesBuildingFit(final Building building) {
+        return !Stream.concat(building.getBuildingProperty().getBlocking().stream(), building.getBuildingProperty().getAdditionalReserving().stream()).anyMatch(xy -> {
+            final var absoluteX = building.getPosition().getX() + xy.getX();
+            final var absoluteY = building.getPosition().getY() + xy.getY();
             return absoluteX < 0 || absoluteX >= SIZE || absoluteY < 0 || absoluteY >= SIZE || blocked[absoluteX][absoluteY] || reserved[absoluteX][absoluteY];
         });
     }
 
-    public void placeBuilding(final int x, final int y, final BuildingProperty building) {
+    public void placeBuilding(final Building building) {
         depictionHasChanged = true;
         var heightSum = 0;
-        for (var xy : building.getBlocking()) {
-            final var absoluteX = x + xy.getX();
-            final var absoluteY = y + xy.getY();
+        for (var xy : building.getBuildingProperty().getBlocking()) {
+            final var absoluteX = building.getPosition().getX() + xy.getX();
+            final var absoluteY = building.getPosition().getY() + xy.getY();
             blocked[absoluteX][absoluteY] = true;
             reserved[absoluteX][absoluteY] = true;
             heightSum += height[absoluteX][absoluteX];
         }
-        ;
-        building.getAdditionalReserving().forEach(xy -> {
-            final var absoluteX = x + xy.getX();
-            final var absoluteY = y + xy.getY();
+        building.getBuildingProperty().getAdditionalReserving().forEach(xy -> {
+            final var absoluteX = building.getPosition().getX() + xy.getX();
+            final var absoluteY = building.getPosition().getY() + xy.getY();
             reserved[absoluteX][absoluteY] = true;
         });
-        var newHeight = Math.round((float) heightSum / (float) building.getBlocking().size());
-        for (var xy : building.getBlocking()) {
-            final var absoluteX = x + xy.getX();
-            final var absoluteY = y + xy.getY();
+        var newHeight = Math.round((float) heightSum / (float) building.getBuildingProperty().getBlocking().size());
+        for (var xy : building.getBuildingProperty().getBlocking()) {
+            final var absoluteX = building.getPosition().getX() + xy.getX();
+            final var absoluteY = building.getPosition().getY() + xy.getY();
             height[absoluteX][absoluteY] = newHeight;
         }
     }

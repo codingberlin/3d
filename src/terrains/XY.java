@@ -1,8 +1,8 @@
 package terrains;
 
 public class XY {
-    final int x;
-    final int y;
+    int x;
+    int y;
 
     public XY(int x, int y) {
         this.x = x;
@@ -15,5 +15,10 @@ public class XY {
 
     public int getY() {
         return y;
+    }
+
+    public void adjustToNewZero(final XY newZero) {
+        this.x -= newZero.getX();
+        this.y -= newZero.getY();
     }
 }
