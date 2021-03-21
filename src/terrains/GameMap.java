@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 public class GameMap {
 
     private static final int SIZE = 100;
+    private static final float HEIGHT_FACTOR = 0.1F;
     private boolean depictionHasChanged = true;
     private final int[][] height = new int[SIZE][SIZE];
     private boolean[][] blocked = new boolean[SIZE][SIZE];
@@ -76,7 +77,7 @@ public class GameMap {
         for (int x = 0; x < SIZE; x++) {
             for (int y = 0; y < SIZE; y++) {
                 vertices[vertexPointer * 3] = (float) y / ((float) SIZE - 1) * SIZE;
-                vertices[vertexPointer * 3 + 1] = height[x][y];
+                vertices[vertexPointer * 3 + 1] = HEIGHT_FACTOR * height[x][y];
                 vertices[vertexPointer * 3 + 2] = (float) x / ((float) SIZE - 1) * SIZE;
                 final var normal = calculateNormal(x, y);
                 normals[vertexPointer * 3] = normal.x;

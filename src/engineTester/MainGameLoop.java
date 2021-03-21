@@ -108,7 +108,7 @@ public class MainGameLoop {
 		entities.add(new Entity(houseModel, new Vector3f(0,0,-200),0,-90,0,6));
 		entities.add(new Entity(houseModel, new Vector3f(50,0,-150),0,-90,0,6));
 
-		Light light = new Light(new Vector3f(20000,20000,2000),new Vector3f(1,1,1));
+		Light light = new Light(new Vector3f(-20000,20000,2000),new Vector3f(1,1,1));
 
 		Camera camera = new Camera();
 		MasterRenderer renderer = new MasterRenderer();
